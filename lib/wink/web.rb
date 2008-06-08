@@ -67,6 +67,20 @@ module Wink::Helpers
     filter(entry.summary, :markdown)
   end
 
+  # The entry's persistent, globally unique identifier; used primarily in
+  # feeds. Defaults to the entry's permalink (#entry_url). See also:
+  # http://diveintomark.org/archives/2004/05/28/howto-atom-id
+  def entry_global_id(entry=@entry)
+    entry_url(entry)
+  end
+
+  # The comment's persistent, globally unique identifier; used primarily in
+  # feeds. Defaults to the comment's url (#comment_url). See also:
+  # http://diveintomark.org/archives/2004/05/28/howto-atom-id
+  def comment_global_id(comment=@comment)
+    comment_url(comment)
+  end
+
   # Convert hash to HTML attribute string.
   def attributes(*attrs)
     return '' if attrs.empty?
@@ -149,6 +163,10 @@ module Wink::Helpers
 
   def topic_ref(tag)
     href(tag.to_s, topic_url(tag))
+  end
+
+  def comment_url(comment)
+    "#{entry_url(comment.entry)}#comment-#{comment.id}"
   end
 
   def input(type, name, value=nil, *attrs)
