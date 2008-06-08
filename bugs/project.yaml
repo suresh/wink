@@ -20,12 +20,16 @@ releases:
     - ""
 - !ditz.rubyforge.org,2008-03-06/release 
   name: "0.2"
-  status: :unreleased
-  release_time: 
+  status: :released
+  release_time: 2008-06-08 05:32:27.034412 Z
   log_events: 
   - - 2008-05-25 15:38:11.731275 Z
     - Ryan Tomayko <r@tomayko.com>
     - created
+    - ""
+  - - 2008-06-08 05:32:27.034427 Z
+    - Ryan Tomayko <r@tomayko.com>
+    - released
     - ""
 - !ditz.rubyforge.org,2008-03-06/release 
   name: "0.3"

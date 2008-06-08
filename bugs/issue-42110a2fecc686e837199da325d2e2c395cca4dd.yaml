@@ -5,7 +5,7 @@ desc: |-
   things aren't blank after initializing the database.
 type: :feature
 component: wink
-release: "0.2"
+release: "0.3"
 reporter: Ryan Tomayko <r@tomayko.com>
 status: :in_progress
 disposition: 
@@ -26,3 +26,7 @@ log_events:
   - Ryan Tomayko <r@tomayko.com>
   - changed status from unstarted to in_progress
   - ""
+- - 2008-06-08 05:24:42.114395 Z
+  - Ryan Tomayko <r@tomayko.com>
+  - assigned to release 0.3 from 0.2
+  - pushing this off until the next release.
