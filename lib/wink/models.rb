@@ -288,7 +288,7 @@ class Comment
   end
 
   def excerpt(length=65)
-    body.to_s.gsub(/[\s\r\n]+/, ' ')[0..65] + " ..."
+    body.to_s.gsub(/[\s\r\n]+/, ' ')[0..length] + " ..."
   end
 
   def body=(text)
