@@ -221,13 +221,13 @@ get Wink.linkings_url do
   haml :home
 end
 
-get (Wink.archive_url + ':year/') do
+get Wink.archive_url + ':year/' do
   @title = "#{wink.author} circa #{params[:year].to_i}"
   @entries = Entry.circa(params[:year].to_i)
   haml :home
 end
 
-get (Wink.tag_url + ':tag') do
+get Wink.tag_url + ':tag' do
   @title = "Regarding: '#{h(params[:tag].to_s.upcase)}'"
   @entries = Entry.tagged(params[:tag])
   @entries.reject! { |e| e.draft? }
@@ -243,7 +243,7 @@ get (Wink.tag_url + ':tag') do
   haml :home
 end
 
-get (Wink.writings_url + ':slug') do
+get Wink.writings_url + ':slug' do
   @entry = Article.first(:slug => params[:slug])
   raise Sinatra::NotFound unless @entry
   require_administrative_privileges if @entry.draft?
@@ -258,7 +258,7 @@ get Wink.drafts_url do
   haml :home
 end
 
-get (Wink.drafts_url + 'new') do
+get Wink.drafts_url + 'new' do
   require_administrative_privileges
   @title = 'New Draft'
   @entry = Article.new(
@@ -283,7 +283,7 @@ post Wink.drafts_url do
   redirect entry_url(@entry)
 end
 
-get (Wink.drafts_url + ':slug') do
+get Wink.drafts_url + ':slug' do
   require_administrative_privileges
   @entry = Entry.first(:slug => params[:slug])
   raise Sinatra::NotFound unless @entry
