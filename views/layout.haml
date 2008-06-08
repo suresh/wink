@@ -4,7 +4,7 @@
   %head
     <meta http-equiv='Content-Type' content='text/html;charset=utf-8'>
     <meta http-equiv='X-UA-Compatible' content='YOUR MOM'>
-    %title= (h(@title) || wink.author)
+    %title= h(@title || wink.title || wink.author)
     = feed '/feed',          "Writings"
     = feed wink.linkings_url + 'feed', "Linkings"
     = feed '/comments/feed', "Comments (Experimental)"
