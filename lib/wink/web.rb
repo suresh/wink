@@ -203,27 +203,38 @@ helpers { include Wink::Helpers }
 # Resources =================================================================
 
 get '/' do
-  redirect '/', 301 if params[:page]
   @title = wink.title
   @entries = Entry.published(:limit => 50)
+
+  last_modified @entries.map{|e| e.updated_at}.max if @entries.any?
+
   haml :home
 end
 
 get Wink.writings_url do
   @title = wink.writings
   @entries = Article.published
+
+  last_modified @entries.map{|e| e.updated_at}.max if @entries.any?
+
   haml :home
 end
 
 get Wink.linkings_url do
   @title = wink.linkings
   @entries = Bookmark.published(:limit => 100)
+
+  last_modified @entries.map{|e| e.updated_at}.max if @entries.any?
+
   haml :home
 end
 
 get Wink.archive_url + ':year/' do
   @title = "#{wink.author} circa #{params[:year].to_i}"
   @entries = Entry.circa(params[:year].to_i)
+
+  last_modified @entries.map{|e| e.updated_at}.max if @entries.any?
+
   haml :home
 end
 
@@ -246,9 +257,13 @@ end
 get Wink.writings_url + ':slug' do
   @entry = Article.first(:slug => params[:slug])
   raise Sinatra::NotFound unless @entry
+
   require_administrative_privileges if @entry.draft?
+  last_modified [@entry.updated_at, *@entry.comments.map{|e| e.created_at}].max
+
   @title = @entry.title
   @comments = @entry.comments
+
   haml :entry
 end
 
@@ -298,21 +313,30 @@ mime :atom, 'application/atom+xml'
 get '/feed' do
   @title = wink.writings
   @entries = Article.published(:limit => 10)
+
+  last_modified @entries.map{|e| e.updated_at}.max if @entries.any?
   content_type :atom, :charset => 'utf-8'
+
   builder :feed, :layout => :none
 end
 
 get Wink.linkings_url + 'feed' do
   @title = wink.linkings
   @entries = Bookmark.published(:limit => 30)
+
+  last_modified @entries.map{|e| e.updated_at}.max if @entries.any?
   content_type :atom, :charset => 'utf-8'
+
   builder :feed, :layout => :none
 end
 
 get '/comments/feed' do
   @title = "Recent Comments"
   @comments = Comment.ham(:limit => 25)
+
+  last_modified @comments.map{|c| c.created_at}.max if @comments.any?
   content_type :atom, :charset => 'utf-8'
+
   builder :comment_feed, :layout => :none
 end
 
