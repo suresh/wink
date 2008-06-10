@@ -63,6 +63,10 @@ unless reloading?
   # List of filters to apply to comments.
   set :comment_filters, [:markdown, :sanitize]
 
+  # List of patterns that should cause a comment to be marked as spam. The
+  # blacklist check occurs before akismet checking.
+  set :comment_blacklist, nil
+
   # URL mappings for various sections of the site
   set :writings_url, "/writings/"
   set :linkings_url, "/linkings/"

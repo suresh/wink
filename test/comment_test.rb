@@ -133,4 +133,24 @@ describe 'Comment' do
     comment.should.not.be.spam
   end
 
+  it 'detects spam using the comment_blacklist when set to a Regexp' do
+    set :comment_blacklist, /foobar/
+    comment = Comment.new(:body => 'Test foobar Spam')
+    comment.check
+    comment.should.be.spam
+  end
+
+  it 'detects spam using the comment_blacklist when set to an Array' do
+    set :comment_blacklist, [/foobar/, /baz/]
+    comment = Comment.new(:body => 'Test foobar Spam')
+    comment.check
+    comment.should.be.spam
+    comment = Comment.new(:body => "Test Spam\nbaz")
+    comment.check
+    comment.should.be.spam
+  end
+
+  # reset comment blacklist to default value
+  after(:each) { Wink.comment_blacklist = nil }
+
 end

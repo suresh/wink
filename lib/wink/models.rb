@@ -331,7 +331,7 @@ class Comment
   def check
     return true if @checked
     @checked = true
-    @spam = akismet(:check) || false
+    @spam = blacklisted? || akismet(:check) || false
   rescue => boom
     logger.error "An error occured while connecting to Akismet: #{boom.to_s}"
     @checked = false
@@ -341,6 +341,11 @@ class Comment
   def check!
     check
     save
+  end
+
+  # True when the comment matches any of the blacklisted patterns.
+  def blacklisted?
+    Array(Wink.comment_blacklist).any? { |pattern| pattern === body }
   end
 
   # Has the current comment been marked as spam?
