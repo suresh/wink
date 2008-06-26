@@ -4,12 +4,6 @@ require 'wink/core_extensions'
 
 describe 'DateTime' do
 
-  it 'responds to #to_time' do
-    datetime = DateTime.parse('1979-01-01T12:00:00-05:00')
-    datetime.should.respond_to :to_time
-    datetime.to_time.should.be == Time.parse('1979-01-01T12:00:00-05:00')
-  end
-
   it 'responds to #iso8601' do
     datetime = DateTime.parse('1979-01-01T12:00:00-00:00')
     datetime.should.respond_to :iso8601
