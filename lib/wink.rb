@@ -11,10 +11,6 @@ unless reloading?
   # omitted when setting this option.
   set :url, 'http://localhost:4567'
 
-  # A regular expression that matches URLs to your site's content. Used
-  # to detect bookmarks and external content referencing the current site.
-  set :url_regex, /http\:/
-
   # The full name of the site's author.
   set :author, 'Anonymous Coward'
 
@@ -44,6 +40,10 @@ unless reloading?
   # When set, del.icio.us bookmark synchronization may be performed by calling
   # Bookmark.synchronize!
   set :delicious, nil
+
+  # A regular expression that matches URLs to your site's content. Used
+  # to detect bookmarks and external content referencing the current site.
+  set :delicious_filter, nil
 
   # Where to write log messages.
   set :log_stream, STDERR

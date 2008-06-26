@@ -35,16 +35,17 @@ module Wink
         if cache && File.exist?(cache)
           File.read(cache)
         else
-          request :all
+          data = request(:all)
+          File.open(cache, 'wb') { |io| io.write(data) } if cache
+          data
         end
-      File.open(cache, 'wb') { |io| io.write(xml) } if cache
       REXML::Document.new(xml)
     end
 
     # The Time of the most recently updated bookmark on del.icio.us.
     def last_updated_at
       if cache
-        @last_updated_at ||= remote_last_updated_at
+        @last_updated_at ||= Time.iso8601(open.root.attributes['update'])
       else
         remote_last_updated_at
       end
@@ -62,23 +63,29 @@ module Wink
     # are yielded.
     def synchronize(options={})
       if since = options[:since]
-        since.utc
+        since = since.to_time if since.respond_to? :to_time
+        since.utc #!
         return false unless updated_since?(since)
       else
         since = Time.at(0)
         since.utc
       end
-      open.elements.each('posts/post') do |el|
-        attributes = el.attributes
-        time = Time.iso8601(attributes['time'])
-        next if time <= since
-        yield :href    => attributes['href'],
-          :hash        => attributes['hash'],
-          :description => attributes['description'],
-          :extended    => attributes['extended'],
-          :time        => time,
-          :shared      => (attributes['shared'] != 'no'),
-          :tags        => attributes['tag'].split(' ')
+      if block_given?
+        open.elements.each('posts/post') do |el|
+          attributes = el.attributes
+          time = Time.iso8601(attributes['time'])
+          next if time <= since
+          yield :href    => attributes['href'],
+            :hash        => attributes['hash'],
+            :description => attributes['description'],
+            :extended    => attributes['extended'],
+            :time        => time,
+            :shared      => (attributes['shared'] != 'no'),
+            :tags        => attributes['tag'].split(' ')
+        end
+      else
+        require 'enumerator'
+        to_enum :synchronize, options
       end
     end
 
@@ -145,4 +152,3 @@ if $0 == __FILE__
   assert_equal 5, count
 
 end
-

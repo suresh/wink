@@ -184,13 +184,17 @@ class Bookmark < Entry
   # synchronization is disabled.
   def self.synchronize(options={})
     return nil if Wink[:delicious].nil?
-    require 'wink/delicious'
-    delicious = Wink::Delicious.new(*Wink[:delicious])
     options.each { |key,val| delicious.send("#{key}=", val) }
     count = 0
+
     delicious.synchronize :since => last_updated_at do |source|
-      next if Wink[:url_regex] && source[:href] =~ Wink[:url_regex]
+
+      # skip URLs matching the delicious_filter regexp
+      next if Wink.delicious_filter && source[:href] =~ Wink.delicious_filter
+
+      # skip private bookmarks
       next unless source[:shared]
+
       bookmark = find_or_create(:slug => source[:hash])
       bookmark.attributes = {
         :url        => source[:href],
@@ -205,8 +209,22 @@ class Bookmark < Entry
       bookmark.tag_names = source[:tags]
       bookmark.save
       count += 1
+
+      # HACK: DataMapper wants to overwrite the created_at date we
+      # set explicitly when creating a new record.
+      bookmark.created_at = source[:time].getlocal
+      bookmark.save
+
     end
+
     count
+  end
+
+  def self.delicious
+    require 'wink/delicious'
+    connection = Wink::Delicious.new(*Wink[:delicious])
+    (class <<self;self;end).send(:define_method, :delicious) { connection }
+    connection
   end
 
   # The Time of the most recently updated Bookmark in UTC.
