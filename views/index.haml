@@ -6,8 +6,6 @@
         = entry_ref(@entry)
       %p.meta.caps
         = @entry.created_at.strftime('%A, %B %d, %Y at %I:%M %p')
-        \/ By 
-        = wink.author
         -if @entry.domain
           = "/ #{@entry.domain}"
       ~ entry_summary
