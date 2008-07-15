@@ -20,8 +20,12 @@ Requirements
 Gems (need all their dependencies of course):
 
     $ sudo gem install datamapper --version=0.2.5
-    $ sudo gem install do_mysql
+    $ sudo gem install do_mysql --version=0.2.4
     $ sudo gem install sinatra BlueCloth rubypants html5 test-spec
+
+You may need to download the do_mysql-0.2.4 gem from
+http://rubyforge.org/frs/?group_id=4651 and install it manually:
+    $ sudo gem install do_mysql-0.2.4.gem
 
 To run the specs you also need SQLite3 and the SQLite3-adapter:
     $ sudo gem install do_sqlite3 --version=0.2.5
