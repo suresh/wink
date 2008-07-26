@@ -105,6 +105,19 @@ module Wink::Helpers
   ].compact.join
   end
 
+  def timestamp!(path)
+    return path if path =~ /http:/
+    file = File.join(wink.public, path)
+    if mtime = (File.mtime(file) rescue nil)
+      path[path.length,0] = '?' + mtime.to_i.to_s
+    end
+    path
+  end
+
+  def timestamp(path)
+    path.dup.timestamp!
+  end
+
   def feed(href, title)
     tag :link, nil,
       :rel => 'alternate',
@@ -115,6 +128,7 @@ module Wink::Helpers
 
   def css(href, media='all')
     href = "/css/#{href}.css" unless href =~ /\.css$/
+    timestamp! href
     tag :link, nil,
       :rel => 'stylesheet',
       :type => 'text/css',
@@ -129,6 +143,7 @@ module Wink::Helpers
       %(<script type='text/javascript'>#{src}</script>)
     else
       src = "/js/#{src}.js" unless src =~ /\.js$/
+      timestamp! src
       %(<script type='text/javascript' src='#{src}'></script>)
     end
   end
