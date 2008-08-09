@@ -4,11 +4,13 @@
   %head
     <meta http-equiv='Content-Type' content='text/html;charset=utf-8'>
     <meta http-equiv='X-UA-Compatible' content='YOUR MOM'>
+    <meta name='viewport' content='width=700'>
     %title= h(@title || wink.title || wink.author)
     = feed '/feed',          "Writings"
     = feed wink.linkings_url + 'feed', "Linkings"
     = feed '/comments/feed', "Comments (Experimental)"
     = css "wink"
+    = css "small-device", media="only screen and (max-device-width: 480px)"
     - if development?
       = script 'jquery-1.2.3'
     - else

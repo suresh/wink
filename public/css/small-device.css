@@ -1,0 +1,23 @@
+body {
+	margin:0 30px;
+	width:700px;
+	color:#000;
+}
+#container {
+	margin:50px 0 10px 0;
+	max-width:none;
+}
+div.index {
+	max-width:none;
+}
+#header {
+	margin:20px 0;
+}
+h1 {
+	font-size:44px;
+	line-height:1.5;
+}
+div.index {
+	margin:40px 0;
+}
+/* vim: set ft=css ts=4 sw=4 noexpandtab: */
