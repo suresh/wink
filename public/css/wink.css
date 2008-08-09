@@ -78,12 +78,13 @@ tt, pre, code, samp, kbd {
 }
 
 pre {
-	color: #333;
-	background-color: #f9f9f9;
-	padding: 6px 4px 4px 6px;
-	border: 1px solid #eee;
+	color:#333;
+	background-color:#f9f9f9;
+	padding:6px 4px 4px 6px;
+	border:1px solid #eee;
 	border-left-width:20px;
-	line-height: 1.1;
+	line-height:1.1;
+	overflow:auto;
 }
 
 code {
@@ -121,19 +122,19 @@ h1, h2, h3 {
 }
 
 h1 {
-	font-size:2.461em;   /* 32px */
-	line-height:1.428;
-	margin:20px 0;
+	font-size:2.923em; /* 38px */
+	line-height:1.05;  /* 40px */
+	margin:10px 0;     /* 60px */
 }
 
 h2 {
-	font-size:23px;
-	line-height:1.36363636; /* repeating, of course */
-	margin:20px 0;
+	font-size:26px;    /* 26px */
+	line-height:1.15;  /* 30px */
+	margin:15px 0;     /* 60px */
 }
 
 h3 {
-	font-size:18px;
+	font-size:23px;
 	line-height:1.1;
 	margin:30px 0 10px 0;
 }
@@ -194,7 +195,7 @@ caption {
 #header h1 a, #header h1 a:link, #header h1 a:visited, #header h1 a:hover {
 	color:#000;
 	text-decoration:none;
-	background:#fff;
+	background:transparent;
 }
 
 #header p {
@@ -202,10 +203,6 @@ caption {
 	color: #777;
 	text-transform: capitalize;
 	font-variant: small-caps;
-}
-
-#header p:first-child kdjshf {
-	margin-bottom:-3px;
 }
 
 #header a, #header a:link, #header a:visited {
