@@ -42,16 +42,6 @@ def environment
   Sinatra.application.options.env.to_sym
 end
 
-# Are we currently running under the production environment?
-def production?
-  environment == :production
-end
-
-# Are we currently running under the development environment?
-def development?
-  environment == :development
-end
-
 # Truthful when the application is in the process of being reloaded
 # by Sinatra.
 def reloading?
