@@ -54,21 +54,3 @@ require 'do_mysql'
 
 gem 'datamapper', '=0.2.5'
 require 'data_mapper'
-
-class DataMapper::Database #:nodoc:
-
-  class Logger < ::Logger
-    def format_message(sev, date, message, progname)
-      message = progname if message.blank?
-      "#{message}\n"
-    end
-  end
-
-  def create_logger
-    logger = Logger.new(Wink.log_stream)
-    logger.level = Logger::DEBUG if development?
-    logger.datetime_format = ''
-    logger
-  end
-
-end
