@@ -67,6 +67,9 @@ unless reloading?
   # blacklist check occurs before akismet checking.
   set :comment_blacklist, nil
 
+  # Enable verbose trace logging
+  set :verbose, false
+
   # URL mappings for various sections of the site
   set :writings_url, "/writings/"
   set :linkings_url, "/linkings/"

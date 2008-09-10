@@ -204,6 +204,13 @@ module Wink::Helpers
     } << "</select>"
   end
 
+  # Write a debug/trace message to the log
+  def trace(message, *params)
+    return unless wink.verbose
+    message = message % params unless params.empty?
+    request.env['rack.errors'].puts "[wink] trace: #{message}"
+  end
+
   def wink
     Wink
   end
