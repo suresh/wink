@@ -1,32 +1,42 @@
+require 'dm-core'
+require 'dm-validations'
+require 'dm-ar-finders'
 require 'wink'
 
+class InvalidRecord < Exception
+end
+
 class Entry
-  include DataMapper::Persistence
+  include DataMapper::Resource
 
-  property :id, :integer, :serial => true
-  property :slug, :string, :size => 255, :nullable => false, :index => :unique
-  property :type, :class, :nullable => false, :index => true
-  property :published, :boolean, :default => false
-  property :title, :string, :size => 255, :nullable => false
-  property :summary, :text, :lazy => false
-  property :filter, :string, :size => 20, :default => 'markdown'
-  property :url, :string, :size => 255
-  property :created_at, :datetime, :nullable => false, :index => true
-  property :updated_at, :datetime, :nullable => false
-  property :body, :text
+  property :id, Integer, :serial => true
 
-  validates_presence_of :title, :slug, :filter
+  property :slug, String, :size => 255, :nullable => false, :index => :unique
+  property :type, Discriminator, :index => true
+  property :published, Boolean, :default => false
+  property :title, String, :size => 255, :nullable => false
+  property :summary, Text, :lazy => false
+  property :filter, String, :size => 20, :default => 'markdown'
+  property :url, String, :size => 255
+  property :created_at, DateTime, :nullable => false, :index => true
+  property :updated_at, DateTime, :nullable => false
+  property :body, Text
 
-  has_many :comments,
+  validates_present :title, :slug, :filter
+
+  has n, :comments,
     :spam.not => true,
-    :order => 'created_at ASC'
+    :order => [:created_at.asc]
 
-  has_and_belongs_to_many :tags,
-    :join_table => 'taggings'
+  has n, :taggings
+  has n, :tags, :through => :taggings
+
+  before(:save) { self.updated_at = DateTime.now }
 
   def initialize(attributes={})
-    @created_at = DateTime.now
-    @filter = 'markdown'
+    self.created_at = DateTime.now
+    self.updated_at = self.created_at
+    self.filter = 'markdown'
     super
     yield self if block_given?
   end
@@ -47,12 +57,12 @@ class Entry
 
   def created_at=(value)
     value = value.to_datetime if value.respond_to?(:to_datetime)
-    @created_at = value
+    attribute_set :created_at, value
   end
 
   def updated_at=(value)
     value = value.to_datetime if value.respond_to?(:to_datetime)
-    @updated_at = value
+    attribute_set :updated_at, value
   end
 
   def published?
@@ -62,7 +72,7 @@ class Entry
   def published=(value)
     value = ! ['false', 'no', '0', ''].include?(value.to_s)
     self.created_at = self.updated_at = DateTime.now if value && draft? && !new_record?
-    @published = value
+    attribute_set :published, value
   end
 
   def publish!
@@ -79,31 +89,39 @@ class Entry
   end
 
   def tag_names=(value)
-    tags.clear
+    taggings.clear
     tag_names =
       if value.respond_to?(:to_ary)
         value.to_ary
+      elsif value.nil?
+        []
       elsif value.respond_to?(:to_str)
         value.split(/[\s,]+/)
       end
-    tag_names.uniq.each do |tag_name|
-      tag = Tag.find_or_create(:name => tag_name)
-      tags << tag
-    end
+    tag_names.uniq.each { |tag_name| tag! tag_name }
   end
 
   def tag_names
-    tags.collect { |t| t.name }
+    taggings.collect { |t| t.tag.name }
+  end
+
+  def tag!(tag_name)
+    if tag = Tag.find_or_create(:name => tag_name)
+      tagging = Tagging.new(:tag => tag)
+      taggings << tagging
+      # tags.reload!
+      tagging
+    end
   end
 
   def self.published(options={})
-    options = { :order => 'created_at DESC', :published => true }.
+    options = { :order => [:created_at.desc], :published => true }.
       merge(options)
     all(options)
   end
 
   def self.drafts(options={})
-    options = { :order => 'created_at DESC', :published => false }.
+    options = { :order => [:created_at.desc], :published => false }.
       merge(options)
     all(options)
   end
@@ -112,7 +130,7 @@ class Entry
     options = {
       :created_at.gte => Date.new(year, 1, 1),
       :created_at.lt => Date.new(year + 1, 1, 1),
-      :order => 'created_at ASC'
+      :order => [:created_at.asc]
     }.merge(options)
     published(options)
   end
@@ -128,28 +146,10 @@ class Entry
   # The most recently published Entry (or specific subclass when called on
   # Article, Bookmark, or other Entry subclass).
   def self.latest(options={})
-    first({ :order => 'created_at DESC', :published => true }.merge(options))
+    first({ :order => [:created_at.desc], :published => true }.merge(options))
   end
 
-  # XXX The following two methods shouldn't be necessary but DM isn't adding
-  # the type condition.
-
-  def self.first(options={}) #:nodoc:
-    return super if self == Entry
-    options = { :type => ([self] + self::subclasses.to_a) }.
-      merge(options)
-    super(options)
-  end
-
-  def self.all(options={}) #:nodoc:
-    return super if self == Entry
-    options = { :type => ([self] + self::subclasses.to_a) }.
-      merge(options)
-    super(options)
-  end
-
-  # XXX neither ::create or ::create! pass the block parameter to ::new so
-  # we need to override to fix that.
+  # XXX neither ::create or ::create! pass the block parameter to ::new
 
   def self::create(attributes={}, &block) #:nodoc:
     instance = new(attributes, &block)
@@ -159,7 +159,7 @@ class Entry
 
   def self::create!(attributes={}, &block) #:nodoc:
     instance = create(attributes, &block)
-    raise DataMapper::InvalidRecord, instance if instance.errors.any?
+    raise InvalidRecord, instance.errors.inspect if instance.errors.any?
     instance
   end
 
@@ -236,20 +236,21 @@ end
 
 
 class Tag
-  include DataMapper::Persistence
+  include DataMapper::Resource
 
-  property :id, :integer, :serial => true
-  property :name, :string, :nullable => false, :index => :unique
-  property :created_at, :datetime, :nullable => false
-  property :updated_at, :datetime, :nullable => false
+  property :id, Integer, :serial => true
+  property :name, String, :nullable => false, :index => :unique
+  property :created_at, DateTime, :nullable => false
+  property :updated_at, DateTime, :nullable => false
 
-  validates_uniqueness_of :name
+  validates_is_unique :name
   alias_method :to_s, :name
 
-  has_and_belongs_to_many :entries,
+  has n, :taggings
+  has n, :entries,
+    :through => :taggings,
     :conditions => { :published => true },
-    :order => "(entries.type = 'Bookmark') ASC, entries.created_at DESC",
-    :join_table => 'taggings'
+    :order => [:created_at.desc]
 
   # When key is a String or Symbol, find a Tag by name; when key is an
   # Integer, find a Tag by id.
@@ -260,49 +261,60 @@ class Tag
     else raise TypeError,    "String, Symbol, or Integer key expected"
     end
   end
+
+  def initialize(*args)
+    self.updated_at = DateTime.now
+    self.created_at ||= self.updated_at
+    super
+  end
+
 end
 
 
-class Tagging #:nodoc:
-  include DataMapper::Persistence
+class Tagging
+  include DataMapper::Resource
+
+  property :id, Integer, :serial => true
 
   belongs_to :entry
   belongs_to :tag
-  index [:entry_id]
-  index [:tag_id]
 end
 
 
 class Comment
-  include DataMapper::Persistence
+  include DataMapper::Resource
 
-  property :id, :integer, :serial => true
-  property :author, :string, :size => 80
-  property :ip, :string, :size => 50
-  property :url, :string, :size => 255
-  property :body, :text, :nullable => false, :lazy => false
-  property :created_at, :datetime, :nullable => false, :index => true
-  property :referrer, :string, :size => 255
-  property :user_agent, :string, :size => 255
-  property :checked, :boolean, :default => false
-  property :spam, :boolean, :default => false, :index => true
+  property :id, Integer, :serial => true
+  property :author, String, :size => 80
+  property :ip, String, :size => 50
+  property :url, String, :size => 255
+  property :body, Text, :nullable => false, :lazy => false
+  property :created_at, DateTime, :nullable => false, :index => true
+  property :referrer, String, :size => 255
+  property :user_agent, String, :size => 255
+  property :checked, Boolean, :default => false
+  property :spam, Boolean, :default => false, :index => true
 
+  property :entry_id, Integer, :index => true
   belongs_to :entry
-  index [ :entry_id ]
 
-  validates_presence_of :body, :entry_id
+  validates_present :body, :entry_id
 
-  before_create do |comment|
-    comment.check
-    true
+  before :create do
+    check
+  end
+
+  def initialize(*args, &b)
+    self.created_at = DateTime.now
+    super
   end
 
   def self.ham(options={})
-    all({:spam.not => true, :order => 'created_at DESC'}.merge(options))
+    all({:spam.not => true, :order => [:created_at.desc]}.merge(options))
   end
 
   def self.spam(options={})
-    all({:spam => true, :order => 'created_at DESC'}.merge(options))
+    all({:spam => true, :order => [:created_at.desc]}.merge(options))
   end
 
   def excerpt(length=65)
@@ -312,15 +324,17 @@ class Comment
   def body=(text)
     # the first sub autolinks URLs when on line by itself; the second sub
     # disables escapes markdown's headings when followed by a number.
-    @body = text.to_s
-    @body.gsub!(/^https?:\/\/\S+$/, '<\&>')
-    @body.gsub!(/^(\s*)(#\d+)/) { [$1, "\\", $2].join }
-    @body.gsub!(/\r/, '')
+    text = text.to_s
+    text.gsub!(/^https?:\/\/\S+$/, '<\&>')
+    text.gsub!(/^(\s*)(#\d+)/) { [$1, "\\", $2].join }
+    text.gsub!(/\r/, '')
+    attribute_set :body, text
   end
 
   def url
     # TODO move this kind of logic into the setter
-    @url.strip unless @url.to_s.strip.blank?
+    return nil if attribute_get(:url).to_s.strip.blank?
+    attribute_get(:url).to_s.strip
   end
 
   def author_link
@@ -337,22 +351,22 @@ class Comment
   end
 
   def author
-    if @author.blank?
+    if (author = attribute_get(:author)).blank?
       'Anonymous Coward'
     else
-      @author
+      author
     end
   end
 
   # Check the comment with Akismet. The spam attribute is updated to reflect
   # whether the spam was detected or not.
   def check
-    return true if @checked
-    @checked = true
-    @spam = blacklisted? || akismet(:check) || false
+    return true if checked
+    self.checked = true
+    self.spam = blacklisted? || akismet(:check) || false
   rescue => boom
     logger.error "An error occured while connecting to Akismet: #{boom.to_s}"
-    @checked = false
+    self.checked = false
   end
 
   # Check the comment with Akismet and immediately save the comment.
@@ -374,7 +388,7 @@ class Comment
   # Mark this comment as Spam and immediately save the comment. If Akismet is
   # enabled, the comment is submitted as spam.
   def spam!
-    @checked = @spam = true
+    self.checked = self.spam = true
     akismet :spam!
     save
   end
@@ -388,7 +402,7 @@ class Comment
   # Mark this comment as Ham and immediately save the comment. If Akismet is
   # enabled, the comment is submitted as Ham.
   def ham!
-    @checked, @spam = true, false
+    self.checked, self.spam = true, false
     akismet :ham!
     save
   end

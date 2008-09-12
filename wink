@@ -43,8 +43,8 @@ if development?
     # We also remove DataMapper's schema cache and subclass tracking since it keeps
     # references to the class objects we've removed above. This ensures that old
     # class objects can be GC'd.
-    DataMapper::Database[:default].adapter.instance_variable_set(:@schema, nil)
-    DataMapper::Persistence.subclasses.clear
+    # DataMapper::Database[:default].adapter.instance_variable_set(:@schema, nil)
+    # DataMapper::Persistence.subclasses.clear
 
     # reload all wink sources.
     load 'wink.rb'

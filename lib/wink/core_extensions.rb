@@ -1,5 +1,11 @@
 # Various extensions to core and library classes.
 
+# TODO move gem declarations elsewhere
+gem 'dm-core', '= 0.9.5'
+gem 'dm-validations', '= 0.9.5'
+gem 'dm-ar-finders', '= 0.9.5'
+require 'dm-core'
+
 require 'date'
 require 'time'
 
@@ -10,11 +16,31 @@ class DateTime #:nodoc:
   def inspect
     "#<DateTime: #{to_s}>"
   end
+  def to_date
+    Date.civil(year, mon, mday)
+  end
+  def to_time
+    if self.offset == 0
+      ::Time.utc(year, month, day, hour, min, sec)
+    else
+      new_offset(0).to_time
+    end
+  end
 end
 
 class Date #:nodoc:
   def inspect
     "#<Date: #{to_s}>"
+  end
+end
+
+class Time
+  def to_datetime
+    jd = DateTime.civil_to_jd(year, mon, mday, DateTime::ITALY)
+    fr = DateTime.time_to_day_fraction(hour, min, [sec, 59].min) +
+           usec.to_r/86400000000
+    of = utc_offset.to_r/86400
+    DateTime.new!(DateTime.jd_to_ajd(jd, fr, of), of, DateTime::ITALY)
   end
 end
 
@@ -47,10 +73,3 @@ end
 def reloading?
   Sinatra.application.reloading?
 end
-
-# datamapper-0.2.5 is incompatible with do_mysql-0.9.2
-gem 'do_mysql', '=0.2.4'
-require 'do_mysql'
-
-gem 'datamapper', '=0.2.5'
-require 'data_mapper'

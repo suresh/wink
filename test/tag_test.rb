@@ -32,8 +32,9 @@ describe 'Tag' do
 
   it "does not allow duplicate tag names to be saved" do
     original = Tag.new(:name => 'test')
-    original.save.should.be.truthful
+    assert_validated original
     original.errors.should.be.empty
+    original.save.should.not.be == false
     duplicate = Tag.create(:name => 'test')
     duplicate.save.should.not.be.truthful
     duplicate.errors.should.not.be.empty
@@ -42,8 +43,8 @@ describe 'Tag' do
   it "implements ::[] finder shortcut with Integer id" do
     tag = Tag.create!(:name => "test")
     Tag.should.respond_to :[]
-    Tag[tag.id].should.be.kind_of Tag
-    Tag[tag.id].id.should.be == tag.id
+    Tag.get!(tag.id).should.be.kind_of Tag
+    Tag.get!(tag.id).id.should.be == tag.id
   end
 
   it "implements ::[] finder shortcut with String name" do

@@ -164,9 +164,9 @@ describe 'Entry' do
     created_at, updated_at = original.created_at, original.updated_at
     sleep 1.0
     entry = Entry.first(:slug => 'test')
-    entry.draft?.should.be true
-    entry.created_at.should == created_at
-    entry.updated_at.should == updated_at
+    entry.should.be.draft
+    entry.created_at.to_s.should.be == created_at.to_s
+    entry.updated_at.to_s.should.be == updated_at.to_s
     entry.published = true
     # entry.save.should.be.truthful
     entry.created_at.should.be > created_at
@@ -241,53 +241,6 @@ describe "Entry#tags association" do
   before(:each) { setup_database }
   after(:each)  { teardown_database }
 
-  it 'can be used to tag new entries' do
-    entry = Entry.new(:slug => 'test', :title => 'Test Tagging Entry')
-    entry.should.be.new_record
-    entry.tags << Tag.new(:name => 'foo')
-    entry.tags << Tag.new(:name => 'bar')
-    entry.tags << Tag.new(:name => 'baz')
-    entry.tags.length.should.be 3
-    entry.should.be.new_record
-    entry.tags.each { |t| t.should.be.new_record }
-    entry.save
-    entry.should.not.be.new_record
-    entry.tags.each { |t| t.should.not.be.new_record }
-  end
-
-  it 'can be used to tag saved entries' do
-    entry = Entry.create(:slug => 'test', :title => 'Test Tagging Entry')
-    entry.should.not.be.new_record
-    entry.errors.should.be.empty
-    entry.tags << Tag.new(:name => 'foo')
-    entry.tags << Tag.new(:name => 'bar')
-    entry.tags << Tag.new(:name => 'baz')
-    entry.tags.length.should.be 3
-    entry.tags.each { |t| t.should.be.new_record }
-    entry.save
-    entry.tags.each { |t| t.should.not.be.new_record }
-  end
-
-  it 'can be cleared' do
-    entry = Entry.create(:slug => 'test', :title => 'Test Tagging Entry')
-    entry.should.not.be.new_record
-    entry.errors.should.be.empty
-    %w[foo bar baz].each { |t| entry.tags << Tag.new(:name => t) }
-    entry.save.should.be.truthful
-    entry.tags.length.should.be 3
-    entry.tags.should.respond_to :clear
-    entry.tags.clear
-    entry.tags.length.should.be 0
-    # it doesn't persist the clear until saved ... watch when we reload:
-    entry = Entry.first(:slug => 'test')
-    entry.tags.length.should.be 3
-    # clear it again and save
-    entry.tags.clear
-    entry.save
-    entry = Entry.first(:slug => 'test')
-    entry.tags.should.be.empty
-  end
-
 end
 
 describe 'Entry#tag_names attribute' do
@@ -300,7 +253,7 @@ describe 'Entry#tag_names attribute' do
     entry.tag_names = ['foo','bar','baz']
     entry.save
     entry.errors.should.be.empty
-    entry.tags.length.should.be 3
+    entry.tag_names.length.should.be == 3
     entry.tag_names.sort.should.be == ['bar','baz','foo']
   end
 
@@ -309,7 +262,7 @@ describe 'Entry#tag_names attribute' do
     entry.tag_names = 'foo bar baz'
     entry.save
     entry.errors.should.be.empty
-    entry.tags.length.should.be 3
+    entry.tag_names.length.should.be 3
     entry.tag_names.sort.should.be == ['bar','baz','foo']
   end
 
@@ -318,7 +271,7 @@ describe 'Entry#tag_names attribute' do
     entry.tag_names = 'foo, bar, baz'
     entry.save
     entry.errors.should.be.empty
-    entry.tags.length.should.be 3
+    entry.tag_names.length.should.be == 3
     entry.tag_names.sort.should.be == ['bar','baz','foo']
   end
 
@@ -327,8 +280,26 @@ describe 'Entry#tag_names attribute' do
     entry.tag_names = %w[foo bar baz bar foo]
     entry.save
     entry.errors.should.be.empty
-    entry.tags.length.should.be 3
+    entry.tag_names.length.should.be == 3
     entry.tag_names.sort.should.be == ['bar','baz','foo']
+  end
+
+  it 'takes nil or an empty Array to clear tags' do
+    entry = Entry.create(:slug => 'test', :title => 'Test Tagging Entry')
+    assert_validated entry
+    entry.tag_names = 'foo bar baz'
+    entry.save.should.be.truthful
+    entry.tag_names.length.should.be == 3
+    entry.tag_names = nil
+    entry.tag_names.length.should.be == 0
+    # it doesn't persist the clear until saved ... watch when we reload:
+    entry = Entry.first(:slug => 'test')
+    entry.tag_names.length.should.be == 3
+    # clear it again and save
+    entry.tag_names = []
+    entry.save
+    entry = Entry.first(:slug => 'test')
+    entry.tag_names.should.be.empty
   end
 
 end

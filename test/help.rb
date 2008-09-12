@@ -14,13 +14,7 @@ require 'wink'
 require 'sinatra/test/unit'
 require 'sinatra/test/spec'
 
-# Use SQLite3 for now
-gem 'do_sqlite3', '=0.2.5'
-require 'do_sqlite3'
-
-Database.configure \
-  :adapter    => 'sqlite3',
-  :database   => 'wink_test.sqlite3'
+Database.configure :default, 'sqlite3::memory:'
 
 Wink.configure do
   set :env, :test
@@ -47,6 +41,10 @@ class Test::Unit::TestCase
         "constant should be defined: #{const_name} (#{name})"
       base.const_get(name)
     end
+  end
+
+  def assert_validated(model)
+    assert_equal [], model.errors.full_messages
   end
 
 end

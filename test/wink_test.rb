@@ -1,6 +1,5 @@
 require File.dirname(__FILE__) + "/help"
 require 'wink'
-require 'data_mapper'
 
 describe 'Wink' do
 
@@ -18,7 +17,7 @@ describe 'Wink' do
     it "defines #{class_name} model at the top level" do
       Object.should.const_defined class_name
       Object.const_get(class_name).should.not.be.nil
-      Object.const_get(class_name).should < DataMapper::Persistence
+      Object.const_get(class_name).should < DataMapper::Resource
     end
   end
 

@@ -41,7 +41,8 @@ describe 'Comment' do
     comment.author.should.be == 'Anonymous Coward'
     comment.url.should.be nil
     comment.author_link?.should.not.be.truthful
-    comment.save.should.be.truthful
+    comment.save #.should.be.truthful
+    assert_validated comment
 
     comment = Comment.first
     comment.body.should.be == 'Test Comment'

@@ -262,15 +262,12 @@ end
 
 get Wink.tag_url + ':tag' do
   @title = "Regarding: '#{h(params[:tag].to_s.upcase)}'"
-  @entries = Entry.tagged(params[:tag])
-  @entries.reject! { |e| e.draft? }
+  @entries = Entry.tagged(params[:tag]).reject { |e| e.draft? }
   @entries.sort! do |b,a|
-    if a.is_a?(Bookmark) && !b.is_a?(Bookmark)
-      -1
-    elsif b.is_a?(Bookmark) && !a.is_a?(Bookmark)
-      1
-    else
-      a.created_at <=> b.created_at
+    case
+    when a.is_a?(Bookmark) && !b.is_a?(Bookmark)  ; -1
+    when b.is_a?(Bookmark) && !a.is_a?(Bookmark)  ;  1
+    else a.created_at <=> b.created_at
     end
   end
   haml :home
@@ -312,7 +309,7 @@ post Wink.drafts_url do
     if params[:id].blank?
       Article.new
     else
-      Entry[params[:id].to_i]
+      Entry.get!(params[:id].to_i)
     end
   @entry.tag_names = params[:tag_names]
   @entry.attributes = params.to_hash
@@ -379,25 +376,25 @@ end
 
 delete '/comments/:id' do
   require_administrative_privileges
-  comment = Comment[params[:id].to_i]
+  comment = Comment.get!(params[:id].to_i)
   raise Sinatra::NotFound if comment.nil?
-  comment.destroy!
+  comment.destroy
   ''
 end
 
 put '/comments/:id' do
   require_administrative_privileges
   bad_request! if request.media_type != 'text/plain'
-  comment = Comment[params[:id].to_i]
+  comment = Comment.get!(params[:id].to_i)
   raise Sinatra::NotFound if comment.nil?
   comment.body = request.body.read
-  comment.save
+  comment.save!
   status 204
   ''
 end
 
 get '/comments/:id' do
-  comment = Comment[params[:id].to_i]
+  comment = Comment.get!(params[:id].to_i)
   raise Sinatra::NotFound if comment.nil?
   comment_body(comment)
 end
