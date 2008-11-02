@@ -1,6 +1,6 @@
 # Database Configuration ====================================================
 
-Database.configure \
+Wink::Schema.configure \
   :adapter    => 'mysql',
   :host       => 'localhost',
   :username   => 'root',
