@@ -79,18 +79,3 @@ describe 'Rack::Request#remote_ip' do
   end
 
 end
-
-
-describe 'Database (DEPRECATED)' do
-
-  it 'is defined' do
-    Object.const_defined?(:Database).should.be.truthful
-  end
-
-  it 'responds to ::configure, ::create!, and ::drop!' do
-    Database.should.respond_to :configure
-    Database.should.respond_to :create!
-    Database.should.respond_to :drop!
-  end
-
-end

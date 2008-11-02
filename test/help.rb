@@ -14,7 +14,7 @@ require 'wink'
 require 'sinatra/test/unit'
 require 'sinatra/test/spec'
 
-Database.configure 'sqlite3::memory:'
+Wink::Schema.configure 'sqlite3::memory:'
 
 Wink.configure do
   set :env, :test
@@ -26,11 +26,11 @@ end
 class Test::Unit::TestCase
 
   def setup_database
-    Database.create! :force => true
+    Wink::Schema.create! :force => true
   end
 
   def teardown_database
-    Database.drop!
+    Wink::Schema.drop!
   end
 
   # Assert that the given constant is defined. The const_name may include

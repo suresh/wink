@@ -68,7 +68,3 @@ module Wink
   end
 
 end
-
-# DEPRECATED: The top-level Database constant will be removed before the next
-# release.
-Database = Wink::Schema
