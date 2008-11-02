@@ -7,7 +7,7 @@ Sinatra::Application.default_options.merge!(
   :views => File.join(File.dirname(__FILE__), 'views')
 )
 
-log = File.new("sinatra.log", "a")
+log = File.new("wink.log", "a")
 STDOUT.reopen(log)
 STDERR.reopen(log)
 
