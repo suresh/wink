@@ -14,7 +14,7 @@ require 'wink'
 require 'sinatra/test/unit'
 require 'sinatra/test/spec'
 
-Database.configure :default, 'sqlite3::memory:'
+Database.configure 'sqlite3::memory:'
 
 Wink.configure do
   set :env, :test
