@@ -3,6 +3,8 @@ require 'sinatra'
 gem 'dm-core'
 gem 'dm-validations'
 gem 'dm-ar-finders'
+# For Atom feeds
+gem 'builder'
 
 require 'wink/core_extensions'
 require 'wink/schema'
