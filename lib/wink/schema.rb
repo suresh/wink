@@ -1,5 +1,7 @@
 require 'wink'
 
+require 'dm-core'
+
 module Wink
 
   # Utility methods for initializing, migrating, and tearing down
@@ -66,7 +68,3 @@ module Wink
   end
 
 end
-
-# DEPRECATED: The top-level Database constant will be removed before the next
-# release.
-Database = Wink::Schema

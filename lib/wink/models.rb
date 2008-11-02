@@ -1,7 +1,8 @@
+require 'wink'
+
 require 'dm-core'
 require 'dm-validations'
 require 'dm-ar-finders'
-require 'wink'
 
 class InvalidRecord < Exception
 end
