@@ -1,4 +1,9 @@
 require 'sinatra'
+
+gem 'dm-core'
+gem 'dm-validations'
+gem 'dm-ar-finders'
+
 require 'wink/core_extensions'
 require 'wink/schema'
 
