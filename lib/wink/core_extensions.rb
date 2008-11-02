@@ -1,9 +1,9 @@
 # Various extensions to core and library classes.
 
 # TODO move gem declarations elsewhere
-gem 'dm-core', '= 0.9.5'
-gem 'dm-validations', '= 0.9.5'
-gem 'dm-ar-finders', '= 0.9.5'
+gem 'dm-core'
+gem 'dm-validations'
+gem 'dm-ar-finders'
 require 'dm-core'
 
 require 'date'
