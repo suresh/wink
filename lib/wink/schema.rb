@@ -1,5 +1,7 @@
 require 'wink'
 
+require 'dm-core'
+
 module Wink
 
   # Utility methods for initializing, migrating, and tearing down
