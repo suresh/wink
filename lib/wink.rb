@@ -80,7 +80,7 @@ module Wink
   def run!(config_file=nil, &block)
     configure(config_file, &block)
     require 'wink/web'
-    Sinatra.application.options.run = true
+    Sinatra::Application.run = true
   end
 
   # Rackup compatible constructor. Use in Rackup files as follows:

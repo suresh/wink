@@ -59,11 +59,20 @@ require 'sinatra'
 # The running environment as a Symbol; obtained from Sinatra's
 # application options.
 def environment
-  Sinatra.application.options.env.to_sym
+  Sinatra::Application.environment.to_sym
 end
 
 # Truthful when the application is in the process of being reloaded
 # by Sinatra.
 def reloading?
-  Sinatra.application.reloading?
+  # ssh - Sinatra.application.reloading?
+  # for the initial load return false and for everytime else return
+  # true
+  unless defined? initial
+    initial = false
+    return false
+  else
+    return true
+  end
+  
 end

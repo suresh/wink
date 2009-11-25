@@ -10,8 +10,7 @@ end
 class Entry
   include DataMapper::Resource
 
-  property :id, Integer, :serial => true
-
+  property :id, Serial
   property :slug, String, :size => 255, :nullable => false, :index => :unique
   property :type, Discriminator, :index => true
   property :published, Boolean, :default => false
@@ -239,7 +238,7 @@ end
 class Tag
   include DataMapper::Resource
 
-  property :id, Integer, :serial => true
+  property :id, Serial
   property :name, String, :nullable => false, :index => :unique
   property :created_at, DateTime, :nullable => false
   property :updated_at, DateTime, :nullable => false
@@ -275,7 +274,7 @@ end
 class Tagging
   include DataMapper::Resource
 
-  property :id, Integer, :serial => true
+  property :id, Serial
 
   belongs_to :entry
   belongs_to :tag
@@ -285,7 +284,7 @@ end
 class Comment
   include DataMapper::Resource
 
-  property :id, Integer, :serial => true
+  property :id, Serial
   property :author, String, :size => 80
   property :ip, String, :size => 50
   property :url, String, :size => 255

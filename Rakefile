@@ -26,7 +26,7 @@ def wink_environment
   if ENV['WINK_ENV']
     ENV['WINK_ENV'].to_sym
   elsif defined?(Sinatra)
-    Sinatra.application.options.env
+    Sinatra::Application.environment
   else
     :development
   end
