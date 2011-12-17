@@ -74,7 +74,7 @@ describe 'Comment' do
   it 'finds only ham with ::ham' do
     Comment.should.respond_to :ham
     (1..10).each do |i|
-      Comment.create! :body => "Test #{i}", 
+      Comment.create! :body => "Test #{i}",
         :entry => @entry,
         :checked => true,
         :spam => (0 == i % 2)
@@ -87,7 +87,7 @@ describe 'Comment' do
   it 'finds only spam with ::spam' do
     Comment.should.respond_to :spam
     (1..10).each do |i|
-      Comment.create! :body => "Test #{i}", 
+      Comment.create! :body => "Test #{i}",
         :entry => @entry,
         :checked => true,
         :spam => (0 == i % 2)

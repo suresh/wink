@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + "/help"
 
 describe 'The Top Level' do
-  
+
   [ :environment, :production?, :development?, :reloading? ].each do |meth|
     it "responds to :#{meth}" do
       Object.private_methods.map{ |s| s.to_sym }.should.include(meth)

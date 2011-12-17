@@ -67,7 +67,7 @@ var PR_keywords = {};
     "not or pass print raise yield False True None";
   var RUBY_KEYWORDS = "then end begin rescue ensure module when undef next " +
     "redo retry alias defined has_many alias_method has_one belongs_to before_filter " +
-    "after_filter"; 
+    "after_filter";
   var SH_KEYWORDS = "done fi test tail head grep sed seq sendmail cat through " +
     "cd sudo time";
 
@@ -937,7 +937,7 @@ var PR_SHOULD_USE_CONTINUATION = true;
   */
 function prettyPrint(opt_whenDone) {
   var isIE6 = PR_isIE6();
-  
+
   // fetch a list of nodes to rewrite
   var codeSegments = [
       document.getElementsByTagName('pre'),

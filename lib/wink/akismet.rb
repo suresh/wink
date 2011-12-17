@@ -12,7 +12,7 @@ module Wink
   # An interface to the Akismet spam detection service.
   #
   # === Comment Information
-  # 
+  #
   # The various Akismet request methods (e.g., #spam!, #ham!, #check) supported by this
   # class take a +params+ argument, which is a Hash of the following key values:
   #
@@ -78,7 +78,7 @@ module Wink
     attr_reader :headers
 
     # Create a new Akismet call site. The +key+ and +url+ arguments are
-    # required and 
+    # required and
     def initialize(key, url, headers={})
       raise ArgumentError, "Expected key and url" if [key,url].any?{ |v| v.nil? }
       @key = key
