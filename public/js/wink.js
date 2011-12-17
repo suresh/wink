@@ -6,7 +6,7 @@ jQuery.extend({
 
 
 	// Perform a PUT request on the resource specified. The data argument
-	// is sent in the request body (without alteration) and the 
+	// is sent in the request body (without alteration) and the
 	// contentType is sent in the "Content-Type" header. If no contentType
 	// is specified, "text/plain" is assumed.
 	put: function( url, data, contentType, callback ) {
@@ -27,7 +27,7 @@ jQuery.extend({
 	},
 
 
-	// Perform a DELETE request on the resource specified and execute 
+	// Perform a DELETE request on the resource specified and execute
 	// callback when response is received and successful.
 	del: function( url, callback ) {
 		return jQuery.ajax({
@@ -38,9 +38,9 @@ jQuery.extend({
 	},
 
 
-	// Import another script from the URL provided and execute callback 
-	// when complete. This is identical to jQuery.getScript() with the 
-	// exception that caching is enabled. 
+	// Import another script from the URL provided and execute callback
+	// when complete. This is identical to jQuery.getScript() with the
+	// exception that caching is enabled.
 	require: function( url, callback ) {
 		return jQuery.ajax({
 			type: 'GET',

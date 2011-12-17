@@ -9,7 +9,7 @@ module Wink
   module Schema
     extend self
 
-    # Configure the default DataMapper database. This method delegates to 
+    # Configure the default DataMapper database. This method delegates to
     # DataMapper::Database::setup but guards against Sinatra reloading.
     def configure(*options)
       DataMapper.setup(:default, *options) unless reloading?
